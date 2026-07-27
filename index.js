@@ -1,13 +1,12 @@
 const express = require('express');
 const mongoose = require ('mongoose')
+const mainRouter = require ("./routes/index.js")
 
 const app = express ()
-
-app.use(express.json());
-
+app.use = ("api/v1",mainRouter)
 
 async function mongodb() {
-    await mongoose.connect("mongodb://127.0.0.1:27017/paytm")
+    await mongoose.connect("mongodb://localhost:27017/patym")
 }
 mongodb()
 
