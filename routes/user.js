@@ -2,10 +2,10 @@ const express = require ("express")
 const z = require ("zod")
 const jwt = require ("jsonwebtoken")
 const db =require ("./mongoose.js")
-
+const bcrypt = require ("brcypt");
+const authmiddleware = require("../authmiddleware.js");
+const Router = require(".");
 const Routes = express.Router ()
- 
-app.use ("/api/user",userRouter)
 
 const userSchema = z.object ({
      username : z.string(),
@@ -15,7 +15,7 @@ const userSchema = z.object ({
 
 })
 
-Routes.post ("/signup",async(req,res) => {
+Routes.post("/signup",authmiddleware, async (req, res) => {
     const username = req.body.username;
     const firstName = req.body.firstName;
     const lastname = req.body.lastname;
@@ -29,17 +29,20 @@ Routes.post ("/signup",async(req,res) => {
     else {
         console.log ("user created")
     }  
+
+    await db.user.insertOne ({
+        username,
+        firstName : firstName,
+        lastname,
+        password,
+    })
+
+    res.json({
+        message: "user created"
+    })
 })
 
-await db.user.insertOne ({
-    username : String,
-    firstName : String,
-    lastname : String,
-    password : String,
-})
-
-
-Routes.post("/signin",(res,req)=>{
+Routes.post("/signin",authmiddleware,async(res,req)=>{
     const username = req.body.username;
     const password = req.body.password;
 
@@ -59,4 +62,28 @@ Routes.post("/signin",(res,req)=>{
 })
 
 
+const updatebody = z.object ({
+    firstName : z.string().optional(),
+    lastname : z.string().optional(),
+    password : z.string().optional()
+
+})
+ 
+Router.put("/",authmiddleware,async(req,res)=>{
+    const result = updatebody.safeParse(req.body)
+    
+    if (!result.success){
+        return res.status (403).json({
+            message : "invalid input"
+        })
+    }
+
+    await db.user.updateOne({
+        id : req.userid
+    })
+
+    res.json (
+        console.log ("user update ")
+    )
+})
 module.exports = Routes;
