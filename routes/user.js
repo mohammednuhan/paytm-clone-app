@@ -1,16 +1,17 @@
 const express = require ("express")
 const z = require ("zod")
 const jwt = require ("jsonwebtoken")
+const db =require ("./mongoose.js")
 
 const Routes = express.Router ()
  
 app.use ("/api/user",userRouter)
 
 const userSchema = z.object ({
-     username : z.string,
-     firstName : z.string,
-     lastname : z.string,
-     password : z.string
+     username : z.string(),
+     firstName : z.string(),
+     lastname : z.string(),
+     password : z.string()
 
 })
 
@@ -49,10 +50,10 @@ Routes.post("/signin",(res,req)=>{
     }
 
     const jwt = jwt.token ({
-        username  
-    },secret_key )
+        userid : userExist._id  
+    },SECRET_KEY )
 
-    res.return(203).json({
+    return res.status(203).json({
         message : "user logged" 
     })
 })

@@ -7,13 +7,13 @@ const bodyParser = require('body-parser');
 
 
 const app = express ()
+
+mongoose.connect("mongodb://127.0.0.1:27017/paytm");
+
+
+app.use(express.json())
+app.use (cors());
 app.use = ("api/v1",mainRouter)
 
-async function mongodb() {
-    await mongoose.connect("mongodb://localhost:27017/patym")
-}
-mongodb()
-
-console.log("running")
 
 app.listen(3000);

@@ -1,27 +1,26 @@
-const secret_key = require ("secret_key")
+const SECRET_KEY = "your_secret_key"
 const jwt = require ("jsonwebtoken")
 
 function authmiddleware(req,res,next ){
-    const token = req.header
+    const token = req.headers.authorization
 
     if(!token){
-        res.return.json(403)
-        console.log("token is already taken")
+        return res.status(403).json
+        console.log("token is missing")
     }
 
-    const decoded = jwt.verify(token,"secret_key")
-    const username  = decoded.user._id 
+    const decoded = jwt.verify(token,SECRET_KEY)
+    const username  = decoded.userid 
 
     if (!username){
-        res.return.json (403)
-        console.log ("username already there")
+        return res.status (403).json 
+        console.log ("invalid token")
     }
 
-    req.userid= user._id
+    req.userid= userid
 
     next()
 }
 
-module.exports(
+module.exports =
     authmiddleware
-)
