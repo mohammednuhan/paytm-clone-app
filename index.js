@@ -1,6 +1,10 @@
 const express = require('express');
 const mongoose = require ('mongoose')
 const mainRouter = require ("./routes/index.js")
+const cors = require ("cors")
+const jwt = require ("jsonwebtoken")
+const bodyParser = require('body-parser');
+
 
 const app = express ()
 app.use = ("api/v1",mainRouter)
