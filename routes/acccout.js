@@ -1,15 +1,22 @@
 const express = require ("express")
-const mongoose = require ("mongoose");
-const Router = require(".");
-const authmiddleware = require ("authmiddleware.js")
-const account = reqiure ("./path-to-your-account-model")
-
+const db = require ("./mongoose.js");
+const Router = express.Router()
+const mongoose = require ("mongoose")
+const  { authmiddleware }= require ("../authmiddleware.js")
 
 Router.get ("/balance",authmiddleware,async (req,res)=>{
-
-    const account = await db.acount.findone(
-        userid = userid
-    )
+    
+    const session = await mongoose.startSession ();
+    session.startTransaction();
+    if (!session ){
+        session.abortTransaction();
+        return res.status(403).json ({
+        message : "trasaction failed"
+        }) 
+    }
+    const account = await db.account.findOne({
+        userid : req.userid
+    },{session})
        
     res.json({
         balance : account.balance
@@ -20,46 +27,64 @@ Router.get ("/balance",authmiddleware,async (req,res)=>{
 
 Router.post("/transfer",authmiddleware,async(req,res)=>{
     const amount = req.body.amount
-    const to =req.body.amount
+    const to = req.body.to
 
     // account
-    const account = await db.account.findOne ({
-        userid : userid
-})
+    const account = await db.account.findOne (
+        {userid : req.userid},
+        null
+            ,{session}
+    ) 
 
     if(!account){
-        return res.status(403).json
+        return res.status(403).json ({
         message : "account not found"
+        })
     }
     //balance 
-    if(account ,balance < amount){
-        return res.status(403).json
+    if(account.balance < amount){
+        return res.status(403).json ({
         message : "insufficent balance"
+        })
     }
     // toaccount ,balance update
-    const toAccount = await db.toAccount.findOne ({
+    const toAccount = await db.account.findOne ({
         userid : to 
     })
     if(!toAccount){
-       return res.status(403).json
-        message : "account not found"     
+        await session.abortTransaction();
+        session.endSession();
+
+       return res.status(403).json ({
+        message : "account not found"
+       })     
     }
     
 
         //balance update
-    await db.account.updateOne ([
+    await db.account.updateOne (
         {
-            userid :req.userid
+            userid : req.userid
         },{
-            balance : -amount 
-        }
-    ])
+            $inc : {
+                balance : -amount 
+            }
+            },{session}
+    )
     
-    await db.toAccount.updateOne ([
+    await db.account.updateOne (
         {
-            userid : req.userid 
+            userid : to
         },{
+            $inc :{
             balance : amount
-        }
-    ])
+            }
+        },{session}
+    )
+      await session.commitTransaction();
+        session.endSession();
+
+        return res.json({
+            message: "Transfer successful"
+        });
 })

@@ -2,23 +2,32 @@ const express = require ("express")
 const z = require ("zod")
 const jwt = require ("jsonwebtoken")
 const db =require ("./mongoose.js")
-const bcrypt = require ("brcypt");
-const authmiddleware = require("../authmiddleware.js");
-const Router = require(".");
+const { authmiddleware } = require("../authmiddleware.js");
 const Routes = express.Router ()
+const SECRET_KEY="your_secret_key";
 
 const userSchema = z.object ({
      username : z.string(),
      firstName : z.string(),
-     lastname : z.string(),
+     lastName : z.string(),
      password : z.string()
 
 })
 
-Routes.post("/signup",authmiddleware, async (req, res) => {
+Routes.post("/signup", async (req, res) => {
+
+    const result = userSchema.safeParse (req.body);
+
+
+    if (!result.success) {
+        return res.status(400).json({
+            message: "Invalid input"
+        });
+    }
+
     const username = req.body.username;
     const firstName = req.body.firstName;
-    const lastname = req.body.lastname;
+    const lastName = req.body.lastName;
     const password = req.body.password;
 
     const userExist = await db.user.findOne ({username : username})
@@ -30,10 +39,10 @@ Routes.post("/signup",authmiddleware, async (req, res) => {
         console.log ("user created")
     }  
 
-    await db.user.insertOne ({
+    await db.user.create ({
         username,
         firstName : firstName,
-        lastname,
+        lastName,
         password,
     })
 
@@ -42,21 +51,22 @@ Routes.post("/signup",authmiddleware, async (req, res) => {
     })
 })
 
-Routes.post("/signin",authmiddleware,async(res,req)=>{
+Routes.post("/signin",async(req,res)=>{
     const username = req.body.username;
     const password = req.body.password;
 
-    const userExist = db.user.findOne ({username : username , password : password })
+    const userExist = await db.user.findOne ({username : username , password : password })
 
     if(userExist) {
         console.log ("user already logged")
     }
 
-    const jwt = jwt.token ({
-        userid : userExist._id  
+    const token = jwt.sign
+    ({
+      userid : userExist._id  
     },SECRET_KEY )
 
-    return res.status(203).json({
+    return res.status(200).json({
         message : "user logged" 
     })
 })
@@ -64,12 +74,12 @@ Routes.post("/signin",authmiddleware,async(res,req)=>{
 
 const updatebody = z.object ({
     firstName : z.string().optional(),
-    lastname : z.string().optional(),
+    lastName : z.string().optional(),
     password : z.string().optional()
 
 })
  
-Router.put("/",authmiddleware,async(req,res)=>{
+Routes.put("/",authmiddleware,async(req,res)=>{
     const result = updatebody.safeParse(req.body)
     
     if (!result.success){
@@ -78,20 +88,24 @@ Router.put("/",authmiddleware,async(req,res)=>{
         })
     }
 
-    await db.user.updateOne({
-        id : req.userid
-    })
+    await db.user.updateOne(
+        { 
+        _id : req.userid
+    },{
+        $set : req.body
+    }
+ )
 
-    res.json (
-        console.log ("user update ")
-    )
+    res.json ({
+        message : "user update "
+    })
 })
 
 
-Router.get("/bulk", async (req, res) => {
+Routes.get("/bulk", async (req, res) => {
     const filter = req.query.filter ||"";
 
-    const users = await User.find({
+    const users = await db.user.find({
         $or: [
             {
                 firstName: {
@@ -115,4 +129,6 @@ Router.get("/bulk", async (req, res) => {
         }))
     });
 });
+
+
 module.exports = Routes;
