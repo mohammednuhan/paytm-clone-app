@@ -1,20 +1,19 @@
 const express = require('express');
-const mongoose = require ('mongoose')
+require ('./mongoose.js')
 const mainRouter = require ("./routes/index.js")
 const cors = require ("cors")
-const account = require ("./backend/routes/account.js")
-const bodyParser = require('body-parser');
-
 
 const app = express ()
 
-mongoose.connect("mongodb://127.0.0.1:27017/paytm");
 
+console.log(mainRouter);
+console.log(typeof mainRouter);
 
 app.use(express.json())
 app.use (cors());
-app.use ("api/v1",mainRouter)
-app.use ("api/v1/account",mainRouter)
+app.use ("/api/v1",mainRouter)
 
 
-app.listen(3000);
+app.listen(3000, () => {
+    console.log("Server is running on port 3000");
+});

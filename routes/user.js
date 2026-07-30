@@ -1,7 +1,7 @@
 const express = require ("express")
 const z = require ("zod")
 const jwt = require ("jsonwebtoken")
-const db =require ("./mongoose.js")
+const db = require("../mongoose.js");
 const { authmiddleware } = require("../authmiddleware.js");
 const Routes = express.Router ()
 const SECRET_KEY="your_secret_key";

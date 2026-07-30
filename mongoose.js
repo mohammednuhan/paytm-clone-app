@@ -1,36 +1,38 @@
 const mongoose = require("mongoose");
 
 async function mongodb() {
-    await mongoose.connect("mongodb://localhost:27017/patym")
+    await mongoose.connect("mongodb://localhost:27017/paytm")
 }
-mongodb()
+mongodb();
 
 
 const userSchema = new mongoose.Schema({
     username : String,
     firstName :String,
-    lastname : String,
+    lastName : String,
     password: String
 });
 
 const accountSchema = new mongoose.Schema ({
-    Usersid : {
+    usersid : {
     type : mongoose.Schema.Types.ObjectId,
-    ref : "users",
-    reqiured : true
+    ref : "User",
+    required : true
     },
     balance : {
         type : Number ,
-        reqiured : true 
+        required : true 
         
     }
 });
 
-const User = mongoose.model
+const user = mongoose.model
             ("User", userSchema);
 
-const balance = mongoose.model 
-                ("account",accountSchema)
+const account = mongoose.model 
+                ("Account",accountSchema)
 
-module.exports =
-    User,account;
+module.exports ={
+    user,
+    account
+}
