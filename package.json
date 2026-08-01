@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "paytm",
   "private": true,
   "version": "0.0.0",
@@ -20,5 +21,13 @@
     "@vitejs/plugin-react": "^6.0.3",
     "oxlint": "^1.71.0",
     "vite": "^8.1.1"
+=======
+  "dependencies": {
+    "brcypt": "^1.0.1",
+    "express": "^5.2.1",
+    "mongoose": "^9.8.0",
+    "node": "^26.5.1",
+    "zod": "^4.4.3"
+>>>>>>> 47561f69e3a61b81021ac8e9f1338a78c377c3e4
   }
 }
