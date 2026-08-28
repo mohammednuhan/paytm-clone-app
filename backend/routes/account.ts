@@ -8,6 +8,17 @@ const Router = express.Router();
 const prisma = new PrismaClient();
 
 
+const wallet = [
+  {
+    axis : { 
+      available : 10 ,
+    },
+    hdfc : {
+      available : 20 ,
+    }
+  }
+]
+
 
 
 // DEPOSIT
