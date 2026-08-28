@@ -1,10 +1,13 @@
 import express, { Request, Response } from "express";
 import { PrismaClient } from "../generated/prisma/client.js";
 import { authmiddleware } from "../authmiddleware.js";
-import { Prismapg}
+import { Prismapg} 
+
 const Router = express.Router();
 
 const prisma = new PrismaClient();
+
+
 
 
 // DEPOSIT
@@ -63,10 +66,7 @@ Router.post("/deposit",authmiddleware, async (req: Request, res: Response) => {
 
 
 // WITHDRAW
-Router.post(
-  "/withdraw",
-  authmiddleware,
-  async (req: Request, res: Response) => {
+Router.post("/withdraw",authmiddleware, async (req: Request, res: Response) => {
 
     const userId = Number((req as any).userId);
     const amount = Number(req.body.amount);
@@ -127,10 +127,7 @@ Router.post(
 
 
 // BALANCE
-Router.get(
-  "/balance",
-  authmiddleware,
-  async (req: Request, res: Response) => {
+Router.get("/balance",authmiddleware,async (req: Request, res: Response) => {
 
     const userId = Number((req as any).userId);
 
